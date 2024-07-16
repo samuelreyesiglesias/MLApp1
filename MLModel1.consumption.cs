@@ -15,13 +15,13 @@ namespace MLApp1
         #region model input class
         public class ModelInput
         {
-            [LoadColumn(0)]
-            [ColumnName(@"col0")]
-            public string Col0 { get; set; }
-
             [LoadColumn(1)]
-            [ColumnName(@"col1")]
-            public float Col1 { get; set; }
+            [ColumnName(@"texto")]
+            public string Texto { get; set; }
+
+            [LoadColumn(2)]
+            [ColumnName(@"clasificacion")]
+            public float Clasificacion { get; set; }
 
         }
 
@@ -33,11 +33,11 @@ namespace MLApp1
         #region model output class
         public class ModelOutput
         {
-            [ColumnName(@"col0")]
-            public float[] Col0 { get; set; }
+            [ColumnName(@"texto")]
+            public float[] Texto { get; set; }
 
-            [ColumnName(@"col1")]
-            public uint Col1 { get; set; }
+            [ColumnName(@"clasificacion")]
+            public uint Clasificacion { get; set; }
 
             [ColumnName(@"Features")]
             public float[] Features { get; set; }
@@ -108,10 +108,10 @@ namespace MLApp1
         {
             var schema = PredictEngine.Value.OutputSchema;
 
-            var labelColumn = schema.GetColumnOrNull("col1");
+            var labelColumn = schema.GetColumnOrNull("clasificacion");
             if (labelColumn == null)
             {
-                throw new Exception("col1 column not found. Make sure the name searched for matches the name in the schema.");
+                throw new Exception("clasificacion column not found. Make sure the name searched for matches the name in the schema.");
             }
 
             // Key values contains an ordered array of the possible labels. This allows us to map the results to the correct label value.

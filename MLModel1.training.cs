@@ -8,45 +8,45 @@ using System.Threading.Tasks;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
 using Microsoft.ML;
+using System.Data.SqlClient;
+using Microsoft.ML.Data;
 
 namespace MLApp1
 {
     public partial class MLModel1
     {
-        public const string RetrainFilePath =  @"C:\Users\Desarrollo 5\Source\Repos\MLApp1\frasestabuladas 2.txt";
-        public const char RetrainSeparatorChar = '	';
-        public const bool RetrainHasHeader =  false;
-        public const bool RetrainAllowQuoting =  false;
+        public const string RetrainConnectionString = @"Data Source=192.168.1.20;Initial Catalog=test;User ID=sa";
+        public const string RetrainCommandString = @"SELECT CAST([texto] as NVARCHAR(MAX)), CAST([clasificacion] as REAL) FROM [dbo].[comentarios]";
 
-         /// <summary>
+        /// <summary>
         /// Train a new model with the provided dataset.
         /// </summary>
         /// <param name="outputModelPath">File path for saving the model. Should be similar to "C:\YourPath\ModelName.mlnet"</param>
-        /// <param name="inputDataFilePath">Path to the data file for training.</param>
-        /// <param name="separatorChar">Separator character for delimited training file.</param>
-        /// <param name="hasHeader">Boolean if training file has a header.</param>
-        public static void Train(string outputModelPath, string inputDataFilePath = RetrainFilePath, char separatorChar = RetrainSeparatorChar, bool hasHeader = RetrainHasHeader, bool allowQuoting = RetrainAllowQuoting)
+        /// <param name="connectionString">Connection string for databases on-premises or in the cloud.</param>
+        /// <param name="commandText">Command string for selecting training data.</param>
+        public static void Train(string outputModelPath, string connectionString = RetrainConnectionString, string commandText = RetrainCommandString)
         {
             var mlContext = new MLContext();
 
-            var data = LoadIDataViewFromFile(mlContext, inputDataFilePath, separatorChar, hasHeader, allowQuoting);
+            var data = LoadIDataViewFromDatabase(mlContext, connectionString, commandText);
             var model = RetrainModel(mlContext, data);
             SaveModel(mlContext, model, data, outputModelPath);
         }
 
         /// <summary>
-        /// Load an IDataView from a file path.
+        /// Load an IDataView from a database source.For more information on how to load data, see aka.ms/loaddata.
         /// </summary>
         /// <param name="mlContext">The common context for all ML.NET operations.</param>
-        /// <param name="inputDataFilePath">Path to the data file for training.</param>
-        /// <param name="separatorChar">Separator character for delimited training file.</param>
-        /// <param name="hasHeader">Boolean if training file has a header.</param>
+        /// <param name="connectionString">Connection string for databases on-premises or in the cloud.</param>
+        /// <param name="commandText">Command string for selecting training data.</param>
         /// <returns>IDataView with loaded training data.</returns>
-        public static IDataView LoadIDataViewFromFile(MLContext mlContext, string inputDataFilePath, char separatorChar, bool hasHeader, bool allowQuoting)
+        public static IDataView LoadIDataViewFromDatabase(MLContext mlContext, string connectionString, string commandText)
         {
-            return mlContext.Data.LoadFromTextFile<ModelInput>(inputDataFilePath, separatorChar, hasHeader, allowQuoting: allowQuoting);
-        }
+            DatabaseLoader loader = mlContext.Data.CreateDatabaseLoader<ModelInput>();
+            DatabaseSource dbSource = new DatabaseSource(SqlClientFactory.Instance, connectionString, commandText);
 
+            return loader.Load(dbSource);
+        }
 
         /// <summary>
         /// Save a model at the specified path.
@@ -89,10 +89,10 @@ namespace MLApp1
         public static IEstimator<ITransformer> BuildPipeline(MLContext mlContext)
         {
             // Data process configuration with pipeline data transformations
-            var pipeline = mlContext.Transforms.Text.FeaturizeText(inputColumnName:@"col0",outputColumnName:@"col0")      
-                                    .Append(mlContext.Transforms.Concatenate(@"Features", new []{@"col0"}))      
-                                    .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName:@"col1",inputColumnName:@"col1",addKeyValueAnnotationsAsText:false))      
-                                    .Append(mlContext.MulticlassClassification.Trainers.LbfgsMaximumEntropy(new LbfgsMaximumEntropyMulticlassTrainer.Options(){L1Regularization=0.03125F,L2Regularization=0.9229964F,LabelColumnName=@"col1",FeatureColumnName=@"Features"}))      
+            var pipeline = mlContext.Transforms.Text.FeaturizeText(inputColumnName:@"texto",outputColumnName:@"texto")      
+                                    .Append(mlContext.Transforms.Concatenate(@"Features", new []{@"texto"}))      
+                                    .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName:@"clasificacion",inputColumnName:@"clasificacion",addKeyValueAnnotationsAsText:false))      
+                                    .Append(mlContext.MulticlassClassification.Trainers.LbfgsMaximumEntropy(new LbfgsMaximumEntropyMulticlassTrainer.Options(){L1Regularization=1F,L2Regularization=1F,LabelColumnName=@"clasificacion",FeatureColumnName=@"Features"}))      
                                     .Append(mlContext.Transforms.Conversion.MapKeyToValue(outputColumnName:@"PredictedLabel",inputColumnName:@"PredictedLabel"));
 
             return pipeline;

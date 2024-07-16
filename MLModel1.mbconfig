@@ -1,20 +1,19 @@
 ﻿{
   "Scenario": "Classification",
   "DataSource": {
-    "Version": 3,
-    "EscapeCharacter": "\"",
-    "ReadMultiLines": false,
-    "KeepDiacritics": false,
-    "KeepPunctuations": false,
-    "AllowQuoting": false,
-    "Type": "TabularFile",
-    "FilePath": "C:\\Users\\Desarrollo 5\\Source\\Repos\\MLApp1\\frasestabuladas 2.txt",
-    "Delimiter": "\t",
-    "DecimalMarker": ".",
-    "HasHeader": false,
+    "Type": "SQL",
+    "Version": 1,
     "ColumnProperties": [
       {
-        "ColumnName": "col0",
+        "ColumnName": "id",
+        "ColumnPurpose": "Ignore",
+        "ColumnDataFormat": "Single",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 5
+      },
+      {
+        "ColumnName": "texto",
         "ColumnPurpose": "Feature",
         "ColumnDataFormat": "String",
         "IsCategorical": false,
@@ -22,14 +21,19 @@
         "Version": 5
       },
       {
-        "ColumnName": "col1",
+        "ColumnName": "clasificacion",
         "ColumnPurpose": "Label",
         "ColumnDataFormat": "Single",
-        "IsCategorical": true,
+        "IsCategorical": false,
         "Type": "Column",
         "Version": 5
       }
-    ]
+    ],
+    "ConnectionString": "Data Source=192.168.1.20;Initial Catalog=test;User ID=sa",
+    "CommandString": "SELECT CAST([texto] as NVARCHAR(MAX)), CAST([clasificacion] as REAL) FROM [dbo].[comentarios]",
+    "DatabaseName": "test",
+    "SelectedTableDbo": "dbo",
+    "TableName": "comentarios"
   },
   "Environment": {
     "Type": "LocalCPU",
@@ -43,17 +47,17 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "LbfgsMaximumEntropyMulti",
-        "Score": 0.86850358618479384,
-        "RuntimeInSeconds": 1.697,
+        "Score": 0.85879282580037819,
+        "RuntimeInSeconds": 6.836,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e7 * e10",
           "e0": {
-            "InputColumnName": "col0",
-            "OutputColumnName": "col0"
+            "InputColumnName": "texto",
+            "OutputColumnName": "texto"
           },
           "e1": {
             "InputColumnNames": [
-              "col0"
+              "texto"
             ],
             "OutputColumnName": "Features"
           },
@@ -62,14 +66,14 @@
             "InputColumnName": "PredictedLabel"
           },
           "e2": {
-            "OutputColumnName": "col1",
-            "InputColumnName": "col1",
+            "OutputColumnName": "clasificacion",
+            "InputColumnName": "clasificacion",
             "AddKeyValueAnnotationsAsText": false
           },
           "e7": {
-            "L1Regularization": 0.03125,
-            "L2Regularization": 0.9229964,
-            "LabelColumnName": "col1",
+            "L1Regularization": 1.0,
+            "L2Regularization": 1.0,
+            "LabelColumnName": "clasificacion",
             "FeatureColumnName": "Features"
           }
         }
@@ -77,18 +81,18 @@
       {
         "Version": 1,
         "Type": "Trial",
-        "TrainerName": "LightGbmMulti",
-        "Score": 0.85170258857594694,
-        "RuntimeInSeconds": 46.446,
+        "TrainerName": "FastForestOva",
+        "Score": 0.834620177864419,
+        "RuntimeInSeconds": 18.667,
         "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e5 * e10",
+          "_SCHEMA_": "e0 * e1 * e2 * e4 * e10",
           "e0": {
-            "InputColumnName": "col0",
-            "OutputColumnName": "col0"
+            "InputColumnName": "texto",
+            "OutputColumnName": "texto"
           },
           "e1": {
             "InputColumnNames": [
-              "col0"
+              "texto"
             ],
             "OutputColumnName": "Features"
           },
@@ -97,98 +101,15 @@
             "InputColumnName": "PredictedLabel"
           },
           "e2": {
-            "OutputColumnName": "col1",
-            "InputColumnName": "col1",
+            "OutputColumnName": "clasificacion",
+            "InputColumnName": "clasificacion",
             "AddKeyValueAnnotationsAsText": false
           },
-          "e5": {
-            "NumberOfLeaves": 1014,
-            "MinimumExampleCountPerLeaf": 20,
-            "LearningRate": 0.99999977667298645,
-            "NumberOfTrees": 1485,
-            "SubsampleFraction": 0.99999977667298645,
-            "MaximumBinCountPerFeature": 166,
-            "FeatureFraction": 0.99999999,
-            "L1Regularization": 2E-10,
-            "L2Regularization": 0.21086967095973788,
-            "LabelColumnName": "col1",
-            "FeatureColumnName": "Features"
-          }
-        }
-      },
-      {
-        "Version": 1,
-        "Type": "Trial",
-        "TrainerName": "LbfgsMaximumEntropyMulti",
-        "Score": 0.83748950042579529,
-        "RuntimeInSeconds": 1.346,
-        "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e7 * e10",
-          "e0": {
-            "InputColumnName": "col0",
-            "OutputColumnName": "col0"
-          },
-          "e1": {
-            "InputColumnNames": [
-              "col0"
-            ],
-            "OutputColumnName": "Features"
-          },
-          "e10": {
-            "OutputColumnName": "PredictedLabel",
-            "InputColumnName": "PredictedLabel"
-          },
-          "e2": {
-            "OutputColumnName": "col1",
-            "InputColumnName": "col1",
-            "AddKeyValueAnnotationsAsText": false
-          },
-          "e7": {
-            "L1Regularization": 0.08050138,
-            "L2Regularization": 2.77967358,
-            "LabelColumnName": "col1",
-            "FeatureColumnName": "Features"
-          }
-        }
-      },
-      {
-        "Version": 1,
-        "Type": "Trial",
-        "TrainerName": "LightGbmMulti",
-        "Score": 0.83126795259581832,
-        "RuntimeInSeconds": 5.957,
-        "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e5 * e10",
-          "e0": {
-            "InputColumnName": "col0",
-            "OutputColumnName": "col0"
-          },
-          "e1": {
-            "InputColumnNames": [
-              "col0"
-            ],
-            "OutputColumnName": "Features"
-          },
-          "e10": {
-            "OutputColumnName": "PredictedLabel",
-            "InputColumnName": "PredictedLabel"
-          },
-          "e2": {
-            "OutputColumnName": "col1",
-            "InputColumnName": "col1",
-            "AddKeyValueAnnotationsAsText": false
-          },
-          "e5": {
-            "NumberOfLeaves": 1198,
-            "MinimumExampleCountPerLeaf": 20,
-            "LearningRate": 0.99999977667298645,
+          "e4": {
             "NumberOfTrees": 4,
-            "SubsampleFraction": 0.99999977667298645,
-            "MaximumBinCountPerFeature": 244,
-            "FeatureFraction": 0.98759241547158982,
-            "L1Regularization": 2E-10,
-            "L2Regularization": 0.66829889057117342,
-            "LabelColumnName": "col1",
+            "NumberOfLeaves": 4,
+            "FeatureFraction": 1.0,
+            "LabelColumnName": "clasificacion",
             "FeatureColumnName": "Features"
           }
         }
@@ -196,18 +117,18 @@
       {
         "Version": 1,
         "Type": "Trial",
-        "TrainerName": "LbfgsMaximumEntropyMulti",
-        "Score": 0.8295904229384673,
-        "RuntimeInSeconds": 1.739,
+        "TrainerName": "FastTreeOva",
+        "Score": 0.7900448057243743,
+        "RuntimeInSeconds": 13.142,
         "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e7 * e10",
+          "_SCHEMA_": "e0 * e1 * e2 * e3 * e10",
           "e0": {
-            "InputColumnName": "col0",
-            "OutputColumnName": "col0"
+            "InputColumnName": "texto",
+            "OutputColumnName": "texto"
           },
           "e1": {
             "InputColumnNames": [
-              "col0"
+              "texto"
             ],
             "OutputColumnName": "Features"
           },
@@ -216,15 +137,60 @@
             "InputColumnName": "PredictedLabel"
           },
           "e2": {
-            "OutputColumnName": "col1",
-            "InputColumnName": "col1",
+            "OutputColumnName": "clasificacion",
+            "InputColumnName": "clasificacion",
             "AddKeyValueAnnotationsAsText": false
           },
-          "e7": {
-            "L1Regularization": 0.256217629,
-            "L2Regularization": 1.29670227,
-            "LabelColumnName": "col1",
-            "FeatureColumnName": "Features"
+          "e3": {
+            "NumberOfLeaves": 4,
+            "MinimumExampleCountPerLeaf": 19,
+            "NumberOfTrees": 5,
+            "MaximumBinCountPerFeature": 245,
+            "FeatureFraction": 0.97541912184806678,
+            "LearningRate": 0.014714208807185191,
+            "LabelColumnName": "clasificacion",
+            "FeatureColumnName": "Features",
+            "DiskTranspose": false
+          }
+        }
+      },
+      {
+        "Version": 1,
+        "Type": "Trial",
+        "TrainerName": "FastTreeOva",
+        "Score": 0.78369146277692947,
+        "RuntimeInSeconds": 11.087,
+        "Parameter": {
+          "_SCHEMA_": "e0 * e1 * e2 * e3 * e10",
+          "e0": {
+            "InputColumnName": "texto",
+            "OutputColumnName": "texto"
+          },
+          "e1": {
+            "InputColumnNames": [
+              "texto"
+            ],
+            "OutputColumnName": "Features"
+          },
+          "e10": {
+            "OutputColumnName": "PredictedLabel",
+            "InputColumnName": "PredictedLabel"
+          },
+          "e2": {
+            "OutputColumnName": "clasificacion",
+            "InputColumnName": "clasificacion",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e3": {
+            "NumberOfLeaves": 4,
+            "MinimumExampleCountPerLeaf": 20,
+            "NumberOfTrees": 4,
+            "MaximumBinCountPerFeature": 254,
+            "FeatureFraction": 1.0,
+            "LearningRate": 0.099999999999999978,
+            "LabelColumnName": "clasificacion",
+            "FeatureColumnName": "Features",
+            "DiskTranspose": false
           }
         }
       }
@@ -253,9 +219,9 @@
     "Subsampling": false,
     "Tuner": "eci-cfo",
     "Type": "ClassificationTrainingOption",
-    "TrainingTime": 120,
+    "TrainingTime": 1000,
     "OptimizeMetric": "F1",
-    "LabelColumn": "col1",
+    "LabelColumn": "clasificacion",
     "AvailableTrainers": [
       "SDCA",
       "LBFGS",
